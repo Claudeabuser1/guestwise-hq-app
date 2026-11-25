@@ -1,7 +1,7 @@
 // Keeps the app shell on the device so it opens instantly from the home screen.
 // Network first for the app's own files (so a deploy shows up at once), cache as the fallback when offline.
 // Data (Supabase) and the CDN are never cached here.
-const CACHE = 'gw-hq-202611251659';
+const CACHE = 'gw-hq-202611251810';
 const SHELL = ['./', 'index.html', 'css/app.css', 'js/app.js', 'js/store.js', 'js/progress.js', 'js/config.js',
   'fonts/inter-tight-latin.woff2', 'img/gw-g.svg', 'img/favicon.svg', 'manifest.webmanifest'];
 
