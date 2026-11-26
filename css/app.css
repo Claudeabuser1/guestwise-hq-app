@@ -191,7 +191,7 @@ textarea.input { resize: vertical; }
   .mobile-top .brand { padding: 0; font-size: 18px; }
   .canvas { padding: 20px 16px calc(96px + env(safe-area-inset-bottom, 0px)); }
   .s6 { grid-column: span 12; }
-  .tabbar { display: grid; grid-template-columns: repeat(4, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; background: var(--ground); border-top: 1px solid var(--rule); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .tabbar { display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; background: var(--ground); border-top: 1px solid var(--rule); padding-bottom: env(safe-area-inset-bottom, 0px); }
   .tabbar a { display: grid; justify-items: center; gap: 3px; padding: 9px 0 8px; font-size: 11px; text-decoration: none; color: #a8a49c; min-height: 52px; }
   .tabbar a svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
   .tabbar a[aria-current="page"] { color: #fff; }
@@ -201,3 +201,29 @@ textarea.input { resize: vertical; }
   .toast { bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
+
+/* ---------- glass (Inställningar → Glas) ----------
+   --glass runs 0–1, set from the slider and saved per device. 0 is the flat look above;
+   higher values let a soft brand-coloured backdrop show through blurred, translucent panels. */
+:root { --glass: .6; }
+@media (prefers-reduced-transparency: reduce) { :root { --glass: 0 !important; } }
+body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: var(--glass);
+  background: radial-gradient(40vmax 40vmax at 6% 2%, rgb(255 106 61 / .7), transparent 70%),
+              radial-gradient(30vmax 30vmax at 48% 52%, rgb(255 120 70 / .32), transparent 70%),
+              radial-gradient(34vmax 34vmax at 96% 22%, rgb(255 186 130 / .4), transparent 70%),
+              radial-gradient(46vmax 46vmax at 72% 102%, rgb(96 140 190 / .5), transparent 70%); }
+.panel, .top, .mobile-top, .side, .tabbar, .start, .demo-note {
+  backdrop-filter: blur(calc(var(--glass) * 32px)) saturate(calc(100% + var(--glass) * 80%));
+  -webkit-backdrop-filter: blur(calc(var(--glass) * 32px)) saturate(calc(100% + var(--glass) * 80%)); }
+.panel, .demo-note { background: linear-gradient(rgb(255 255 255 / calc(var(--glass) * .08)), rgb(255 255 255 / calc(var(--glass) * .02))), rgb(34 33 32 / calc(1 - var(--glass) * .72));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / calc(var(--glass) * .16)), inset 0 0 0 1px rgb(255 255 255 / calc(var(--glass) * .07)); }
+.top, .mobile-top, .tabbar { background: rgb(22 22 22 / calc(1 - var(--glass) * .55)); }
+.side { background: rgb(22 22 22 / calc(var(--glass) * .3)); }
+.start { background: rgb(251 250 247 / calc(1 - var(--glass) * .12)); box-shadow: inset 0 1px 0 rgb(255 255 255 / calc(var(--glass) * .9)); }
+.input, .top .search input { background: rgb(22 22 22 / calc(1 - var(--glass) * .5)); }
+.pill, .steps li::before { background: rgb(47 46 44 / calc(1 - var(--glass) * .45)); }
+.bar { background: linear-gradient(rgb(255 255 255 / calc(var(--glass) * .12)), rgb(255 255 255 / calc(var(--glass) * .12))), rgb(47 46 44 / calc(1 - var(--glass) * .6)); }
+.glass-row { display: grid; grid-template-columns: 1fr auto; gap: 10px 16px; align-items: center; }
+.glass-row label { font-weight: 500; }
+.glass-row output { font-size: 14px; color: var(--muted); }
+.range { grid-column: 1 / -1; width: 100%; height: 28px; accent-color: var(--text); cursor: pointer; }

@@ -18,6 +18,7 @@ const I = {
   plan: '<path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/><circle cx="12" cy="12" r="3"/>',
   search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>',
   back: '<path d="M15 5l-7 7 7 7"/>',
+  gear: '<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
 };
 const icon = (n) => `<svg viewBox="0 0 24 24" aria-hidden="true">${I[n]}</svg>`;
 const BRAND = '<img src="img/gw-g.svg" alt="" width="17" height="23">uestwise';
@@ -61,6 +62,7 @@ function shell(name, body) {
     link('uppgifter', '#/uppgifter', 'Uppgifter', 'list', `<span class="count num">${open}</span>`),
     link('mitt', '#/mitt', 'Mitt', 'me'),
     link('planeraren', '#/planeraren', 'Planeraren', 'plan'),
+    link('installningar', '#/installningar', 'Inställningar', 'gear'),
   ];
   const tabs = nav.map((n) => n.replace(/<span class="count[^<]*<\/span>/, ''));
   const other = data.members.find((m) => m.email !== me.email);
@@ -323,14 +325,33 @@ function planner() {
     </div>`);
 }
 
+// ---------- settings (this device only) ----------
+const GLASS_KEY = 'gw-hq-glass';
+const glassNow = () => Math.round(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--glass')) * 100) || 0;
+function settings() {
+  const g = glassNow();
+  return shell('installningar', `
+    <div class="title-row"><div><h1>Inställningar</h1><p class="sub">Gäller bara den här enheten.</p></div></div>
+    <div class="grid top-aligned">
+      <section class="panel s6" aria-labelledby="look-h">
+        <div class="panel-head"><h2 id="look-h">Utseende</h2></div>
+        <div class="glass-row">
+          <label for="glass">Glas</label><output for="glass" id="glass-out" class="num">${g} %</output>
+          <input class="range" type="range" id="glass" min="0" max="100" step="1" value="${g}" data-glass>
+        </div>
+        <p class="meta" style="margin-top:10px">0 % är helt mörkt och platt. Högre värden gör panelerna genomskinliga och suddiga, som glas.</p>
+      </section>
+    </div>`);
+}
+
 function render() {
   if (!data) return;
   const r = route();
   if (r.name !== 'uppgift') { editing = false; confirmDelete = null; }
   const html = r.name === 'uppgifter' ? tasks(r.params) : r.name === 'uppgift' ? detail(r.id) : r.name === 'ny' ? newTask(r.params)
-    : r.name === 'mitt' ? personal() : r.name === 'planeraren' ? planner() : home();
+    : r.name === 'mitt' ? personal() : r.name === 'planeraren' ? planner() : r.name === 'installningar' ? settings() : home();
   app.innerHTML = html;
-  const titles = { oversikt: 'Översikt', uppgifter: 'Uppgifter', uppgift: 'Uppgift', ny: 'Ny uppgift', mitt: 'Mitt', planeraren: 'Planeraren' };
+  const titles = { oversikt: 'Översikt', uppgifter: 'Uppgifter', uppgift: 'Uppgift', ny: 'Ny uppgift', mitt: 'Mitt', planeraren: 'Planeraren', installningar: 'Inställningar' };
   document.title = `${titles[r.name] ?? 'Översikt'} – Guestwise HQ`;
 }
 
@@ -345,6 +366,13 @@ function gate(msg) {
 }
 
 // ---------- events ----------
+app.addEventListener('input', (e) => {
+  if (!e.target.matches('[data-glass]')) return;
+  const v = e.target.value;
+  document.documentElement.style.setProperty('--glass', v / 100);
+  document.getElementById('glass-out').textContent = `${v} %`;
+  try { localStorage.setItem(GLASS_KEY, v); } catch {}
+});
 const lines = (s) => String(s || '').split('\n').map((x) => x.trim()).filter(Boolean);
 
 app.addEventListener('change', (e) => {
